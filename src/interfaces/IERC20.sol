@@ -6,7 +6,7 @@ interface IERC20 {
 
     function balanceOf(address account) external view returns (uint256);
 
-    function TransferToken(
+    function transfer(
         address recipient,
         uint256 amount
     ) external returns (bool);
@@ -18,16 +18,9 @@ interface IERC20 {
 
     function approve(address spender, uint256 amount) external returns (bool);
 
-    function transferfrom(
+    function transferFrom(
         address sender,
         address recipient,
         uint256 amount
     ) external returns (bool);
-
-    event Transfer(address indexed from, address indexed to, uint256 amount);
-    event Approval(
-        address indexed owner,
-        address indexed spender,
-        uint256 amount
-    );
 }

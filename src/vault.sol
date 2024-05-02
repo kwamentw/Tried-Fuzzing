@@ -36,11 +36,11 @@ contract Vault {
      * Burns vault shares from sender
      * @param shares amount of shares
      */
-    function _burn(uint256 shares) internal {
-        require(shares > 0, "we have to burn something");
-        totalSupply -= shares;
-        balanceOfUser[msg.sender] -= shares;
-    }
+    // function _burn(uint256 shares) internal {
+    //     require(shares > 0, "we have to burn something");
+    //     totalSupply -= shares;
+    //     balanceOfUser[msg.sender] -= shares;
+    // }
 
     /**
      * Returns the amount of underlying assets this contract holds
@@ -62,32 +62,26 @@ contract Vault {
 
     /**
      * Converts shares to amount of underlying asset or token
-     * @param shares amount of shares
      */
-    function convertToAssets(uint256 shares) private view returns (uint256) {
-        uint256 amountAssets = (shares * totalAssets()) / totalSupply;
-        return amountAssets;
-    }
+    // function convertToAssets(uint256 shares) private view returns (uint256) {
+    //     uint256 amountAssets = (shares * totalAssets()) / totalSupply;
+    //     return amountAssets;
+    // }
 
-    function deposit(uint256 amount) external {
+    function deposit(address user, uint256 amount) external {
         uint256 shares = converToShares(amount);
         _mint(shares);
-        bool ok = IERC20(i_underlying).transferfrom(
-            msg.sender,
-            address(this),
-            amount
-        );
-        require(ok, "Txn failed");
+        IERC20(i_underlying).transferFrom(user, address(this), amount);
     }
 
-    function withdraw() external {
-        uint256 shares = balanceOfUser[msg.sender];
-        uint256 amountToWithdraw = convertToAssets(shares);
-        _burn(shares);
-        bool ok = IERC20(i_underlying).TransferToken(
-            msg.sender,
-            amountToWithdraw
-        );
-        require(ok, "Txn failed");
-    }
+    // function withdraw() external {
+    //     uint256 shares = balanceOfUser[msg.sender];
+    //     uint256 amountToWithdraw = convertToAssets(shares);
+    //     _burn(shares);
+    //     bool ok = IERC20(i_underlying).TransferToken(
+    //         msg.sender,
+    //         amountToWithdraw
+    //     );
+    //     require(ok, "Txn failed");
+    // }
 }
