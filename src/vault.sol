@@ -26,7 +26,7 @@ contract Vault {
      * Mints shares to sender
      * @param shares amount of shares to mint
      */
-    function _mint(uint256 shares) public {
+    function _mint(uint256 shares) internal {
         require(shares > 0, "Cannot mint 0 shares");
         totalSupply += shares;
         balanceOfUser[msg.sender] += shares;

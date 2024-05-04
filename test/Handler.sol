@@ -15,8 +15,9 @@ contract VaultHandler is Test {
         token = new ERC20("4BTOKEN", "4BTKN", 6, 900);
         simplevault = _vault;
 
-        vm.prank(address(simplevault));
+        vm.startPrank(address(simplevault));
         token.mint(address(simplevault), 100e6);
+        vm.stopPrank();
     }
 
     function deposit(uint256 amountOfAssets) public {
