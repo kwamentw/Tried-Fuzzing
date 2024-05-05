@@ -8,6 +8,11 @@ import {StdInvariant} from "forge-std/StdInvariant.sol";
 import {VaultHandler} from "./Handler.sol";
 import {console2} from "forge-std/console2.sol";
 
+/**
+ * @title Vault Test
+ * @notice Test script for the vault
+ */
+
 contract VaultTest is Test {
     ERC20 underlyingTkn;
     Vault simplevault;
@@ -15,25 +20,37 @@ contract VaultTest is Test {
 
     address USER = makeAddr("USER");
 
+    /**
+     * Setting up all the variables needed for testing
+     */
     function setUp() public {
+        // initializing underlying asset
         underlyingTkn = new ERC20("FOURBTOKEN", "4bTKN", 6, 1000);
+
+        // initializing vault
         simplevault = new Vault(
             address(underlyingTkn),
             underlyingTkn.decimals()
         );
+
+        // initializing my handler
         handler = new VaultHandler(simplevault);
 
+        // setting custom selectors(This way stateful fuzz will be between these functions and not random ones)
         bytes4[] memory selectorss = new bytes4[](1);
         selectorss[0] = handler.deposit.selector;
         targetSelector(
             FuzzSelector({addr: address(handler), selectors: selectorss})
         );
 
+        // setting target contract so invariant tests interact with handler instead of actual contract
         targetContract(address(handler));
 
+        // minting some tokens to the vault
         vm.prank(address(simplevault));
         underlyingTkn.mint(address(simplevault), 1000e6);
 
+        // minting some tokens to the handler
         vm.prank(address(handler));
         underlyingTkn.mint(address(handler), 1000e6);
     }
@@ -42,6 +59,9 @@ contract VaultTest is Test {
     //     simplevault.converToShares(90e6);
     // }
 
+    /**
+     * Unit test for the deposit function
+     */
     function testDepositing() public {
         vm.startPrank(USER);
         underlyingTkn.mint(USER, 100e6);
@@ -91,6 +111,9 @@ contract VaultTest is Test {
         assertLt(simplevault.balanceOfUser(USER), simplevault.totalSupply());
     }
 
+    /**
+     * Trying to find the cause of the overflow/undeflow error
+     */
     function testhandlerDeposit() public {
         handler.deposit(100e6);
     }
