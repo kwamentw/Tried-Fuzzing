@@ -3,7 +3,7 @@ pragma solidity 0.8.20;
 
 import {Test} from "forge-std/Test.sol";
 import {Vault} from "../src/vault.sol";
-import {ERC20} from "../src/mock/ERC20Mock.sol";
+import {FourbToken} from "../src/mock/ERC20Mock.sol";
 import {StdInvariant} from "forge-std/StdInvariant.sol";
 import {VaultHandler} from "./Handler.sol";
 import {console2} from "forge-std/console2.sol";
@@ -14,7 +14,7 @@ import {console2} from "forge-std/console2.sol";
  */
 
 contract VaultTest is Test {
-    ERC20 underlyingTkn;
+    FourbToken underlyingTkn;
     Vault simplevault;
     VaultHandler handler;
 
@@ -25,7 +25,7 @@ contract VaultTest is Test {
      */
     function setUp() public {
         // initializing underlying asset
-        underlyingTkn = new ERC20("FOURBTOKEN", "4bTKN", 6, 1000);
+        underlyingTkn = new FourbToken("FOURBTOKEN", "4bTKN", 6, 1000);
 
         // initializing vault
         simplevault = new Vault(
@@ -48,11 +48,11 @@ contract VaultTest is Test {
 
         // minting some tokens to the vault
         vm.prank(address(simplevault));
-        underlyingTkn.mint(address(simplevault), 1000e6);
+        underlyingTkn.mint(1000e6);
 
         // minting some tokens to the handler
         vm.prank(address(handler));
-        underlyingTkn.mint(address(handler), 1000e6);
+        underlyingTkn.mint(1000e6);
     }
 
     // function testConverShares() public view {
@@ -64,9 +64,9 @@ contract VaultTest is Test {
      */
     function testDepositing() public {
         vm.startPrank(USER);
-        underlyingTkn.mint(USER, 100e6);
+        underlyingTkn.mint(100e6);
 
-        underlyingTkn.approve(address(simplevault), 100e6);
+        underlyingTkn.approve(100e6, address(simplevault));
 
         simplevault.deposit(USER, 100e6);
 
@@ -80,22 +80,22 @@ contract VaultTest is Test {
         console2.log(simplevault.balanceOfUser(USER));
     }
 
-    // function testWithdrawVault1() public {
-    //     vm.startPrank(USER);
-    //     underlyingTkn.mint(100e6);
+    function testWithdrawVault1() public {
+        vm.startPrank(USER);
+        underlyingTkn.mint(100e6);
 
-    //     underlyingTkn.approve(95e6, address(simplevault));
+        underlyingTkn.approve(95e6, address(simplevault));
 
-    //     simplevault.deposit(90e6);
+        simplevault.deposit(USER, 90e6);
 
-    //     vm.stopPrank();
+        vm.stopPrank();
 
-    //     vm.prank(USER);
-    //     simplevault.withdraw();
+        vm.prank(USER);
+        simplevault.withdraw();
 
-    //     assertEq(simplevault.balanceOfUser(USER), 0);
-    //     assertEq(underlyingTkn.balanceOfAddress(USER), 100e6);
-    // }
+        assertEq(simplevault.balanceOfUser(USER), 0);
+        assertEq(underlyingTkn.balanceOfAddress(USER), 100e6);
+    }
 
     /**
      * Invariant to check that total assets are always greater than balance of User

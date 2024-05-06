@@ -1,80 +1,141 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.20;
 
-import {IERC20} from "../interfaces/IERC20.sol";
-
-contract ERC20 is IERC20 {
-    event Transfer(address indexed from, address indexed to, uint256 value);
-    event Approval(
-        address indexed owner,
-        address indexed spender,
-        uint256 value
-    );
-
+/**
+ * @title An ERC20 Token contract
+ * @author Kwame 4B
+ * @notice Testing out basic functionality
+ */
+contract FourbToken {
     uint256 public totalSupply;
-    mapping(address => uint256) public balanceOf;
-    mapping(address => mapping(address => uint256)) public allowance;
+    // returns standard decimals for tokens
+    uint8 public decimals;
     string public name;
     string public symbol;
-    uint8 public decimals;
+    // to track balance of addresses
+    mapping(address => uint256) public balanceOf;
+    // tracking allowances
+    mapping(address => mapping(address => uint256 _value)) public Allowance;
 
+    // emits the specified details when there's a successful transfer
+    event Transfer(address indexed from, address indexed to, uint256 amount);
+    // emits when there's an approval
+    event Approve(
+        address indexed owner,
+        address indexed spender,
+        uint256 amount
+    );
+
+    /**
+     * Initializing necessary variables
+     */
     constructor(
         string memory _name,
         string memory _symbol,
         uint8 _decimals,
-        uint256 initialAmount
+        uint256 _initialAmount
     ) {
         name = _name;
         symbol = _symbol;
         decimals = _decimals;
-        _mint(address(this), initialAmount);
+        totalSupply = _initialAmount * (10 ** (decimals));
+        //balanceOf[msg.sender] = totalSupply;
     }
 
-    function transfer(
-        address recipient,
+    /**
+     * A function that transfers tokens to a valid receiver
+     * @param receiver address of receiver
+     * @param _amount amount sent to receiver
+     */
+    function TransferToken(
+        address receiver,
+        uint256 _amount
+    ) external returns (bool) {
+        require(_amount < balanceOf[msg.sender], "Insufficient balance");
+        require(_amount != 0, "You have to transfer something");
+        require(receiver != address(0), "Invalid receiver");
+        balanceOf[msg.sender] -= _amount;
+        balanceOf[receiver] += _amount;
+        emit Transfer(msg.sender, receiver, _amount);
+        return true;
+    }
+
+    /**
+     * A function to allocate funds to users
+     * @param amount Amount approved to spend
+     * @param Spender Address of account spending approved funds
+     */
+    function approve(uint256 amount, address Spender) external returns (bool) {
+        require(Spender != address(0), "Invalid address");
+        require(
+            amount < balanceOf[msg.sender] && amount != 0,
+            "we cant do this"
+        );
+        Allowance[msg.sender][Spender] = amount;
+        emit Approve(msg.sender, Spender, amount);
+        return true;
+    }
+
+    function balAllowances(address spender) external view returns (uint, uint) {
+        uint256 balance = Allowance[msg.sender][spender];
+        uint256 balance1 = Allowance[spender][msg.sender];
+        return (balance, balance1);
+    }
+
+    /**
+     * A function to transfer tokens from one address to another
+     * @param from Address of sender
+     * @param to address of receiver
+     * @param amount amount to be sent
+     */
+    function transferfrom(
+        address from,
+        address to,
         uint256 amount
     ) external returns (bool) {
-        balanceOf[msg.sender] -= amount;
-        balanceOf[recipient] += amount;
-        emit Transfer(msg.sender, recipient, amount);
-        return true;
-    }
-
-    function approve(address spender, uint256 amount) external returns (bool) {
-        allowance[msg.sender][spender] = amount;
-        emit Approval(msg.sender, spender, amount);
-        return true;
-    }
-
-    function transferFrom(
-        address sender,
-        address recipient,
-        uint256 amount
-    ) external returns (bool) {
-        // allowance[sender][msg.sender] -= amount;
-        balanceOf[sender] -= amount;
-        balanceOf[recipient] += amount;
-        emit Transfer(sender, recipient, amount);
-        return true;
-    }
-
-    function _mint(address to, uint256 amount) internal {
+        require(from != address(0) && to != address(0), "first error");
+        require(amount != 0, "second error");
         balanceOf[to] += amount;
-        totalSupply += amount;
-        emit Transfer(address(0), to, amount);
-    }
-
-    function _burn(address from, uint256 amount) internal {
         balanceOf[from] -= amount;
+        Allowance[from][to] -= amount;
+        emit Transfer(from, to, amount);
+        return true;
+    }
+
+    /**
+     * Check the balance of the address provided
+     * @param owner address of owner
+     */
+    function balanceOfAddress(address owner) public view returns (uint) {
+        return balanceOf[owner];
+    }
+
+    /**
+     * A function that mints tokens
+     * @param amount amount to be minted
+     */
+    function mint(uint256 amount) external returns (bool) {
+        require(amount != 0, "invalid amount");
+        balanceOf[msg.sender] += amount;
+        totalSupply += amount;
+        emit Transfer(address(0), msg.sender, amount);
+        return true;
+    }
+
+    /**
+     * A function that burns existing tokens
+     * @param amount amount to be burnt from pool
+     */
+    function burn(uint256 amount) external returns (bool) {
+        require(amount != 0, "You have to burn something");
+        require(amount < totalSupply, "Invalid amount");
+        balanceOf[msg.sender] -= amount;
         totalSupply -= amount;
-        emit Transfer(from, address(0), amount);
+        emit Transfer(msg.sender, address(0), amount);
+        return true;
     }
 
-    function mint(address to, uint256 amount) external {
-        _mint(to, amount);
-    }
-
-    function burn(address from, uint256 amount) external {
-        _burn(from, amount);
+    function NoDecimals() external view returns (uint8) {
+        return decimals;
     }
 }
