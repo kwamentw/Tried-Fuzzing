@@ -45,4 +45,12 @@ contract VaultHandler is Test {
         simplevault.deposit(address(this), amountOfAssets);
         vm.stopPrank();
     }
+
+    /**
+     * A function to call vault withdraw
+     */
+    function withdraw() public {
+        vm.prank(address(this));
+        simplevault.withdraw();
+    }
 }
