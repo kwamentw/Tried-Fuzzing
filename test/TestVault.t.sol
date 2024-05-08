@@ -3,7 +3,7 @@ pragma solidity 0.8.20;
 
 import {Test} from "forge-std/Test.sol";
 import {Vault} from "../src/vault.sol";
-import {FourbToken} from "../src/mock/ERC20Mock.sol";
+import {ERC20} from "../src/mock/ERC20Mock.sol";
 import {StdInvariant} from "forge-std/StdInvariant.sol";
 import {VaultHandler} from "./Handler.sol";
 import {console2} from "forge-std/console2.sol";
@@ -14,7 +14,7 @@ import {console2} from "forge-std/console2.sol";
  */
 
 contract VaultTest is Test {
-    FourbToken underlyingTkn;
+    ERC20 underlyingTkn;
     Vault simplevault;
     VaultHandler handler;
 
@@ -25,7 +25,7 @@ contract VaultTest is Test {
      */
     function setUp() public {
         // initializing underlying asset
-        underlyingTkn = new FourbToken("FOURBTOKEN", "4bTKN", 6, 1000);
+        underlyingTkn = new ERC20("FOURBTOKEN", "4bTKN", 6);
 
         // initializing vault
         simplevault = new Vault(
@@ -48,11 +48,11 @@ contract VaultTest is Test {
 
         // minting some tokens to the vault
         vm.prank(address(simplevault));
-        underlyingTkn.mint(1000e6);
+        underlyingTkn.mint(address(simplevault), 1000e6);
 
         // minting some tokens to the handler
         vm.prank(address(handler));
-        underlyingTkn.mint(1000e6);
+        underlyingTkn.mint(address(simplevault), 1000e6);
     }
 
     // function testConverShares() public view {
@@ -64,9 +64,9 @@ contract VaultTest is Test {
      */
     function testDepositing() public {
         vm.startPrank(USER);
-        underlyingTkn.mint(100e6);
+        underlyingTkn.mint(USER, 100e6);
 
-        underlyingTkn.approve(100e6, address(simplevault));
+        underlyingTkn.approve(address(simplevault), 100e6);
 
         simplevault.deposit(USER, 100e6);
 
@@ -82,9 +82,9 @@ contract VaultTest is Test {
 
     function testWithdrawVault1() public {
         vm.startPrank(USER);
-        underlyingTkn.mint(100e6);
+        underlyingTkn.mint(USER, 100e6);
 
-        underlyingTkn.approve(95e6, address(simplevault));
+        underlyingTkn.approve(address(simplevault), 95e6);
 
         simplevault.deposit(USER, 90e6);
 
@@ -94,7 +94,7 @@ contract VaultTest is Test {
         simplevault.withdraw();
 
         assertEq(simplevault.balanceOfUser(USER), 0);
-        assertEq(underlyingTkn.balanceOfAddress(USER), 100e6);
+        assertEq(underlyingTkn.balanceOf(USER), 100e6);
     }
 
     /**
@@ -115,6 +115,6 @@ contract VaultTest is Test {
      * Trying to find the cause of the overflow/undeflow error
      */
     function testhandlerDeposit() public {
-        handler.deposit(100e6);
+        handler.deposit(90e6);
     }
 }

@@ -71,17 +71,14 @@ contract Vault {
     function deposit(address user, uint256 amount) external {
         uint256 shares = converToShares(amount);
         _mint(shares);
-        IERC20(i_underlying).transferfrom(user, address(this), amount);
+        IERC20(i_underlying).transferFrom(user, address(this), amount);
     }
 
     function withdraw() external {
         uint256 shares = balanceOfUser[msg.sender];
         uint256 amountToWithdraw = convertToAssets(shares);
         _burn(shares);
-        bool ok = IERC20(i_underlying).TransferToken(
-            msg.sender,
-            amountToWithdraw
-        );
+        bool ok = IERC20(i_underlying).transfer(msg.sender, amountToWithdraw);
         require(ok, "Txn failed");
     }
 }
