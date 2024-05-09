@@ -25,7 +25,7 @@ contract VaultTest is Test {
      */
     function setUp() public {
         // initializing underlying asset
-        underlyingTkn = new ERC20("FOURBTOKEN", "4bTKN", 6);
+        underlyingTkn = new ERC20("FOURBTOKEN", "4bTKN", 6, 1000);
 
         // initializing vault
         simplevault = new Vault(
@@ -37,11 +37,11 @@ contract VaultTest is Test {
         handler = new VaultHandler(simplevault);
 
         // setting custom selectors(This way stateful fuzz will be between these functions and not random ones)
-        bytes4[] memory selectorss = new bytes4[](1);
-        selectorss[0] = handler.deposit.selector;
-        targetSelector(
-            FuzzSelector({addr: address(handler), selectors: selectorss})
-        );
+        // bytes4[] memory selectorss = new bytes4[](1);
+        // selectorss[0] = handler.deposit.selector;
+        // targetSelector(
+        //     FuzzSelector({addr: address(handler), selectors: selectorss})
+        // );
 
         // setting target contract so invariant tests interact with handler instead of actual contract
         targetContract(address(handler));
@@ -52,7 +52,7 @@ contract VaultTest is Test {
 
         // minting some tokens to the handler
         vm.prank(address(handler));
-        underlyingTkn.mint(address(simplevault), 1000e6);
+        underlyingTkn.mint(address(handler), 1000e6);
     }
 
     // function testConverShares() public view {
@@ -84,9 +84,9 @@ contract VaultTest is Test {
         vm.startPrank(USER);
         underlyingTkn.mint(USER, 100e6);
 
-        underlyingTkn.approve(address(simplevault), 95e6);
+        underlyingTkn.approve(address(simplevault), 100e6);
 
-        simplevault.deposit(USER, 90e6);
+        simplevault.deposit(USER, 100e6);
 
         vm.stopPrank();
 
@@ -115,6 +115,6 @@ contract VaultTest is Test {
      * Trying to find the cause of the overflow/undeflow error
      */
     function testhandlerDeposit() public {
-        handler.deposit(90e6);
+        handler.deposit(100e6);
     }
 }

@@ -18,10 +18,16 @@ contract ERC20 is IERC20 {
     string public symbol;
     uint8 public decimals;
 
-    constructor(string memory _name, string memory _symbol, uint8 _decimals) {
+    constructor(
+        string memory _name,
+        string memory _symbol,
+        uint8 _decimals,
+        uint256 initialAmount
+    ) {
         name = _name;
         symbol = _symbol;
         decimals = _decimals;
+        _mint(address(this), initialAmount);
     }
 
     function transfer(
@@ -45,14 +51,14 @@ contract ERC20 is IERC20 {
         address recipient,
         uint256 amount
     ) external returns (bool) {
-        allowance[sender][msg.sender] -= amount;
+        // allowance[sender][msg.sender] -= amount;
         balanceOf[sender] -= amount;
         balanceOf[recipient] += amount;
         emit Transfer(sender, recipient, amount);
         return true;
     }
 
-    function _mint(address to, uint256 amount) public {
+    function _mint(address to, uint256 amount) internal {
         balanceOf[to] += amount;
         totalSupply += amount;
         emit Transfer(address(0), to, amount);

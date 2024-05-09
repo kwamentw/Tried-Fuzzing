@@ -32,6 +32,10 @@ contract Vault {
         balanceOfUser[msg.sender] += shares;
     }
 
+    function mint_(uint256 shares) public {
+        _mint(shares);
+    }
+
     /**
      * Burns vault shares from sender
      * @param shares amount of shares
@@ -71,7 +75,12 @@ contract Vault {
     function deposit(address user, uint256 amount) external {
         uint256 shares = converToShares(amount);
         _mint(shares);
-        IERC20(i_underlying).transferFrom(user, address(this), amount);
+        bool ok = IERC20(i_underlying).transferFrom(
+            user,
+            address(this),
+            amount
+        );
+        require(ok, "Txn failed");
     }
 
     function withdraw() external {

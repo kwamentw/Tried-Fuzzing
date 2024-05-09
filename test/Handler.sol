@@ -18,7 +18,7 @@ contract VaultHandler is Test {
 
     constructor(Vault _vault) {
         // initialising token
-        token = new ERC20("4BTOKEN", "4BTKN", 6);
+        token = new ERC20("4BTOKEN", "4BTKN", 6, 900);
         // initialising vault
         simplevault = _vault;
 
@@ -38,17 +38,14 @@ contract VaultHandler is Test {
         amountOfAssets = bound(amountOfAssets, 1e6, 100e6);
 
         vm.startPrank(address(this));
-        token.mint(address(this), amountOfAssets);
+        token.mint(address(this), amountOfAssets + 10e6);
 
-        token.approve(address(simplevault), amountOfAssets - 10e6);
+        token.approve(address(simplevault), amountOfAssets + 10e6);
 
         simplevault.deposit(address(this), amountOfAssets);
         vm.stopPrank();
     }
 
-    /**
-     * A function to call vault withdraw
-     */
     function withdraw() public {
         vm.prank(address(this));
         simplevault.withdraw();
