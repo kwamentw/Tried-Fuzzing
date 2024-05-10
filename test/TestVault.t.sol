@@ -10,14 +10,18 @@ import {console2} from "forge-std/console2.sol";
 
 /**
  * @title Vault Test
- * @notice Test script for the vault
+ * @notice Test script for testing the vault
  */
 
 contract VaultTest is Test {
+    // underlying token
     ERC20 underlyingTkn;
+    // vault contract
     Vault simplevault;
+    // vault handler for invariant testing
     VaultHandler handler;
 
+    // actor
     address USER = makeAddr("USER");
 
     /**
@@ -55,10 +59,6 @@ contract VaultTest is Test {
         underlyingTkn.mint(address(handler), 1000e6);
     }
 
-    // function testConverShares() public view {
-    //     simplevault.converToShares(90e6);
-    // }
-
     /**
      * Unit test for the deposit function
      */
@@ -80,6 +80,9 @@ contract VaultTest is Test {
         console2.log(simplevault.balanceOfUser(USER));
     }
 
+    /**
+     * Unit test for withdraw function
+     */
     function testWithdrawVault1() public {
         vm.startPrank(USER);
         underlyingTkn.mint(USER, 100e6);
@@ -112,6 +115,7 @@ contract VaultTest is Test {
     }
 
     /**
+     * Testing whether handler deposit was working.
      * Trying to find the cause of the overflow/undeflow error
      */
     function testhandlerDeposit() public {

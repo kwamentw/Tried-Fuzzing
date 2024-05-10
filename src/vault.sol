@@ -3,6 +3,11 @@ pragma solidity 0.8.20;
 
 import {IERC20} from "./interfaces/IERC20.sol";
 
+/**
+ * @title MyVault
+ * @author 4B
+ * @notice This vault was created purposely for fuzzing
+ */
 contract Vault {
     address public immutable i_underlying;
 
@@ -15,6 +20,11 @@ contract Vault {
 
     mapping(address => uint) public balanceOfUser;
 
+    /**
+     * //////////////  INITIALIZING /////////////
+     * @param _underlying underlying token of the vault to be initialised
+     * @param _decimals number of decimals the vault will be working with
+     */
     constructor(address _underlying, uint8 _decimals) {
         i_underlying = _underlying;
         i_decimals = _decimals;
@@ -72,6 +82,11 @@ contract Vault {
         return amountAssets;
     }
 
+    /**
+     * Depositing assets into the vault
+     * @param user address of user depositing the shares
+     * @param amount amount of underlying token to deposit
+     */
     function deposit(address user, uint256 amount) external {
         uint256 shares = converToShares(amount);
         _mint(shares);
@@ -83,6 +98,9 @@ contract Vault {
         require(ok, "Txn failed");
     }
 
+    /**
+     * Withdrawing shares user has in the vault
+     */
     function withdraw() external {
         uint256 shares = balanceOfUser[msg.sender];
         uint256 amountToWithdraw = convertToAssets(shares);

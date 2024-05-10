@@ -46,6 +46,9 @@ contract VaultHandler is Test {
         vm.stopPrank();
     }
 
+    /**
+     * A function to call the vault withdraw
+     */
     function withdraw() public {
         vm.prank(address(this));
         simplevault.withdraw();

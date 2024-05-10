@@ -3,6 +3,11 @@ pragma solidity 0.8.20;
 
 import {IERC20} from "../interfaces/IERC20.sol";
 
+/**
+ * @title ERC20 contract
+ * @author solidty by example
+ * @notice Needed to create a mock for testing purposes
+ */
 contract ERC20 is IERC20 {
     event Transfer(address indexed from, address indexed to, uint256 value);
     event Approval(
