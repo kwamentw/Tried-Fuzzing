@@ -14,6 +14,7 @@ contract VaultHandler is Test {
     Vault simplevault;
     ERC20 token;
 
+    // A supposed actor we didn't use
     address USER = makeAddr("USER");
 
     constructor(Vault _vault) {
